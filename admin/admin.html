@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel – Investor System</title>
+
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>Admin Panel</h2>
+  <ul>
+    <li class="active" onclick="showSection('dashboard')">Dashboard</li>
+    <li onclick="showSection('createInvestor')">Create Investor</li>
+    <li onclick="showSection('earnings')">Credit Earnings</li>
+    <li onclick="showSection('withdrawals')">Approve Withdrawals</li>
+    <li onclick="showSection('investors')">All Investors</li>
+    <li onclick="showSection('transactions')">Transactions</li>
+    <li onclick="logout()">Logout</li>
+  </ul>
+</div>
+
+<div class="main">
+
+  <!-- Dashboard -->
+  <section id="dashboard" class="section active">
+    <h1>Welcome, Admin</h1>
+    <p>Use the left menu to manage investors and transactions.</p>
+  </section>
+
+  <!-- Create Investor -->
+  <section id="createInvestor" class="section">
+    <h1>Create New Investor</h1>
+
+    <input id="invName" type="text" placeholder="Full Name">
+    <input id="invEmail" type="email" placeholder="Email">
+    <input id="invPlan" type="text" placeholder="Plan (e.g., Gold Plan)">
+    <input id="invAmount" type="number" placeholder="Invested Amount">
+
+    <button onclick="createInvestor()">Create Investor</button>
+
+    <p id="createMsg"></p>
+  </section>
+
+  <!-- Credit Earnings -->
+  <section id="earnings" class="section">
+    <h1>Credit Weekly Earnings</h1>
+
+    <input id="earnUID" type="text" placeholder="Investor UID">
+    <input id="earnAmount" type="number" placeholder="Amount to Credit">
+
+    <button onclick="creditEarnings()">Credit Earnings</button>
+
+    <p id="earnMsg"></p>
+  </section>
+
+  <!-- Approve Withdrawals -->
+  <section id="withdrawals" class="section">
+    <h1>Pending Withdrawals</h1>
+
+    <table id="withdrawTable">
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- All Investors -->
+  <section id="investors" class="section">
+    <h1>All Investors</h1>
+
+    <table id="investorTable">
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Plan</th>
+          <th>Invested</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- All Transactions -->
+  <section id="transactions" class="section">
+    <h1>All Transactions</h1>
+    <table id="transTable">
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+</div>
+
+<script type="module" src="admin.js"></script>
+
+</body>
+</html>
