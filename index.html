@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LuxpowerTek — Investor Portal</title>
+  <style>
+    /* --- Simple modern CSS (mobile-first) --- */
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa6bf;
+      --accent:#00a3ff;
+      --glass: rgba(255,255,255,0.03);
+      --success:#10b981;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,#071124 0%, #071a2a 100%);
+      color:#e6eef8;
+      padding:24px;
+    }
+    .container{
+      width:100%;
+      max-width:980px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:20px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:20px;
+      border-radius:12px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    }
+
+    .grid-2{display:grid;grid-template-columns:1fr;gap:18px}
+    @media(min-width:900px){ .grid-2{grid-template-columns: 420px 1fr} }
+
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#5eead4);
+      display:flex;align-items:center;justify-content:center;font-weight:700;color:#042028;
+      box-shadow: 0 6px 20px rgba(0,163,255,0.12);
+    }
+    h1{margin:0;font-size:20px}
+    p.lead{color:var(--muted);margin:6px 0 0;font-size:13px}
+
+    .tabs{display:flex;gap:8px;margin-top:18px}
+    .tab{
+      padding:10px 14px;border-radius:10px;background:transparent;border:1px solid transparent;
+      cursor:pointer;font-weight:600;color:var(--muted)
+    }
+    .tab.active{background:rgba(255,255,255,0.03);color:var(--accent);border-color:rgba(0,163,255,0.08)}
+
+    .field{margin-top:12px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input, select, textarea{
+      width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+      background:var(--glass);color:inherit;font-size:14px;
+    }
+    button{
+      margin-top:14px;padding:12px 16px;border-radius:10px;border:none;background:var(--accent);
+      color:#012027;font-weight:700;cursor:pointer;width:100%;
+    }
+    .muted{color:var(--muted);font-size:13px;margin-top:8px}
+    .small-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 10px;border-radius:8px}
+
+    .help{font-size:13px;color:var(--muted);margin-top:8px}
+    .footer-note{font-size:12px;color:#8a98b0;margin-top:12px}
+
+    /* error */
+    .error{color:#ff7b7b;font-size:13px;margin-top:8px}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card grid-2">
+      <div>
+        <div class="brand">
+          <div class="logo">LP</div>
+          <div>
+            <h1>LuxpowerTek Investor Portal</h1>
+            <p class="lead">Secure access to your investments — track earnings, transactions, and request withdrawals.</p>
+          </div>
+        </div>
+
+        <div class="tabs" style="margin-bottom:8px">
+          <div class="tab active" id="tab-login">Login</div>
+          <div class="tab" id="tab-signup">Sign up</div>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="login-panel">
+          <div class="field">
+            <label for="login-uid">Your UID</label>
+            <input id="login-uid" placeholder="e.g. LP-4521" />
+          </div>
+          <div class="field">
+            <label for="login-pass">Password</label>
+            <input id="login-pass" type="password" placeholder="••••••••" />
+          </div>
+          <div class="field">
+            <button id="btn-login">Sign in</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="small-btn" id="btn-reset">Forgot password</button>
+          </div>
+          <div id="login-msg" class="error" style="display:none"></div>
+          <div class="footer-note">Tip: use the UID you received from the team.</div>
+        </div>
+
+        <!-- SIGNUP -->
+        <div id="signup-panel" style="display:none">
+          <div class="field"><label for="su-fullname">Full name</label><input id="su-fullname" placeholder="Jane Doe" /></div>
+          <div class="field"><label for="su-uid">Choose UID</label><input id="su-uid" placeholder="e.g. LP-4521" /></div>
+          <div class="field"><label for="su-email">Email</label><input id="su-email" type="email" placeholder="you@example.com" /></div>
+          <div class="field"><label for="su-pass">Password</label><input id="su-pass" type="password" placeholder="Strong password" /></div>
+          <div class="field"><label for="su-plan">Investment Plan (optional)</label>
+            <select id="su-plan">
+              <option value="">Select plan</option>
+              <option value="Starter">Starter – $100</option>
+              <option value="Growth">Growth – $300</option>
+              <option value="Silver">Silver – $1,000</option>
+            </select>
+          </div>
+          <div class="field"><label for="su-amt">Initial deposit (optional)</label><input id="su-amt" type="number" min="0" placeholder="0" /></div>
+          <div class="field"><button id="btn-signup">Create account</button></div>
+          <div id="signup-msg" class="error" style="display:none"></div>
+          <div class="help">If you already have a UID (given by LuxpowerTek), use Login instead. Admins can also create accounts for you.</div>
+        </div>
+      </div>
+
+      <!-- right column with quick features -->
+      <div style="padding-left:8px">
+        <div class="card" style="background:transparent;padding:14px">
+          <h3 style="margin:0 0 6px 0">Why join?</h3>
+          <ul style="margin:0;padding-left:18px;color:var(--muted)">
+            <li>Track your weekly earnings in real-time</li>
+            <li>Request withdrawals and view status</li>
+            <li>Secure sign-in using your unique UID</li>
+            <li>Clear transaction history and next payout info</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:12px;padding:12px">
+          <h4 style="margin:0 0 6px 0">Support</h4>
+          <div class="muted">Contact: <strong>invest@luxpowertek.example</strong></div>
+          <div class="muted" style="margin-top:8px">Need admin help? We can create your UID for you.</div>
+        </div>
+
+        <div class="card" style="margin-top:12px;padding:12px">
+          <h4 style="margin:0 0 6px 0">Security</h4>
+          <div class="muted">We use Firebase Auth and Firestore with role-based rules to keep data safe.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;color:var(--muted);font-size:13px">
+      © LuxpowerTek — Investor Portal
+    </div>
+  </div>
+
+  <!-- Firebase v9 modular SDK (CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, collection, query, where, getDocs, setDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // TODO: Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBNpB_rDh6wBbInp1gppxZ27ZxeBU6Nb6g",
+      authDomain: "luxpowertek-4f650.firebaseapp.com",
+      projectId: "luxpowertek-4f650",
+      storageBucket: "luxpowertek-4f650.appspot.com",
+      messagingSenderId: "316144364474",
+      appId: "1:316144364474:web:dfe8838c6ba0e874aa4b83"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI elements
+    const tabLogin = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+    const loginPanel = document.getElementById('login-panel');
+    const signupPanel = document.getElementById('signup-panel');
+
+    tabLogin.addEventListener('click', ()=>{ tabLogin.classList.add('active'); tabSignup.classList.remove('active'); loginPanel.style.display='block'; signupPanel.style.display='none'; });
+    tabSignup.addEventListener('click', ()=>{ tabSignup.classList.add('active'); tabLogin.classList.remove('active'); loginPanel.style.display='none'; signupPanel.style.display='block'; });
+
+    // LOGIN flow using customUID
+    document.getElementById('btn-login').addEventListener('click', async ()=>{
+      const uidInput = document.getElementById('login-uid').value.trim();
+      const pass = document.getElementById('login-pass').value;
+      const msg = document.getElementById('login-msg');
+      msg.style.display='none'; msg.textContent='';
+
+      if(!uidInput || !pass){ msg.style.display='block'; msg.textContent='Please enter your UID and password.'; return; }
+
+      try{
+        // 1) query users collection for a document where customUID == uidInput
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('customUID','==',uidInput));
+        const snap = await getDocs(q);
+        if(snap.empty){ msg.style.display='block'; msg.textContent='UID not found. Contact support.'; return; }
+        const docSnap = snap.docs[0];
+        const userData = docSnap.data();
+        const email = userData.email;
+        if(!email){ msg.style.display='block'; msg.textContent='No email linked to this UID. Contact support.'; return; }
+
+        // 2) sign in with the found email + password
+        await signInWithEmailAndPassword(auth, email, pass);
+        // on success redirect to dashboard
+        window.location.href = 'dashboard.html';
+      }catch(err){
+        console.error(err);
+        msg.style.display='block';
+        msg.textContent = err.message || 'Login failed.';
+      }
+    });
+
+    // SIGN-UP (optional public sign up)
+    document.getElementById('btn-signup').addEventListener('click', async ()=>{
+      const fullName = document.getElementById('su-fullname').value.trim();
+      const customUID = document.getElementById('su-uid').value.trim();
+      const email = document.getElementById('su-email').value.trim();
+      const pass = document.getElementById('su-pass').value;
+      const plan = document.getElementById('su-plan').value;
+      const amt = Number(document.getElementById('su-amt').value || 0);
+      const msg = document.getElementById('signup-msg');
+      msg.style.display='none'; msg.textContent='';
+
+      if(!fullName || !customUID || !email || !pass){ msg.style.display='block'; msg.textContent='Please fill name, UID, email and password.'; return; }
+      try{
+        // create auth user
+        const newUser = await createUserWithEmailAndPassword(auth, email, pass);
+        const createdAt = serverTimestamp();
+
+        // create user doc in Firestore
+        const userDocRef = doc(db, 'users', newUser.user.uid);
+        await setDoc(userDocRef, {
+          fullName,
+          email,
+          customUID,
+          plan: plan || null,
+          investedAmount: amt || 0,
+          weeklyROI: plan === 'Starter' ? 6 : plan === 'Growth' ? 8 : plan === 'Silver' ? 12 : null,
+          totalEarned: 0,
+          nextPayout: null,
+          balance: amt || 0,
+          status: 'active',
+          createdAt
+        });
+
+        // If initial deposit > 0, create a deposit transaction
+        if(amt > 0){
+          await addDoc(collection(db,'transactions'), {
+            uid: newUser.user.uid,
+            customUID,
+            type:'deposit',
+            amount: amt,
+            date: serverTimestamp(),
+            status:'completed'
+          });
+        }
+
+        alert('Account created. Redirecting to dashboard...');
+        window.location.href = 'dashboard.html';
+      }catch(err){
+        console.error(err);
+        msg.style.display='block';
+        msg.textContent = err.message || 'Failed to create account.';
+      }
+    });
+
+    // Password reset by UID: look up email then send reset
+    document.getElementById('btn-reset').addEventListener('click', async ()=>{
+      const uidInput = document.getElementById('login-uid').value.trim();
+      const msg = document.getElementById('login-msg');
+      msg.style.display='none'; msg.textContent='';
+      if(!uidInput){ msg.style.display='block'; msg.textContent='Enter your UID first.'; return; }
+      try{
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('customUID','==',uidInput));
+        const snap = await getDocs(q);
+        if(snap.empty){ msg.style.display='block'; msg.textContent='UID not found.'; return; }
+        const userData = snap.docs[0].data();
+        const email = userData.email;
+        await sendPasswordResetEmail(auth, email);
+        msg.style.display='block';
+        msg.style.color='var(--success)';
+        msg.textContent='Password reset email sent to ' + email;
+      }catch(err){
+        console.error(err);
+        msg.style.display='block';
+        msg.textContent = err.message || 'Failed to send reset email.';
+      }
+    });
+
+  </script>
+</body>
+</html>
