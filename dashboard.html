@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Investor Dashboard — LuxpowerTek</title>
+  <style>
+    :root{
+      --bg:#071224; --card:#071a2a; --muted:#9aa6bf; --accent:#00a3ff; --glass:rgba(255,255,255,0.02);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:linear-gradient(180deg,#071124,#041424);color:#e9f2ff;padding:14px}
+    nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#5eead4);display:flex;align-items:center;justify-content:center;font-weight:700;color:#042028;}
+    .container{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:980px){ .container{grid-template-columns:320px 1fr} }
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .stat{display:flex;flex-direction:column;gap:6px}
+    .stat .value{font-size:20px;font-weight:700}
+    .muted{color:var(--muted);font-size:13px}
+    .btn{background:var(--accent);border:none;padding:10px 12px;border-radius:10px;color:#012027;font-weight:700;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:8px;text-align:left;font-size:13px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .badge{padding:6px 8px;border-radius:8px;font-size:12px}
+    .badge.pending{background:rgba(255,165,0,0.12);color:#ffd8a8}
+    .badge.completed{background:rgba(16,185,129,0.12);color:#a7f3d0}
+    .right{display:flex;gap:8px;align-items:center}
+    .empty{color:var(--muted);padding:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="logo">LP</div>
+      <div>
+        <div style="font-weight:700">LuxpowerTek</div>
+        <div class="muted" style="font-size:12px">Investor Dashboard</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div id="userName" class="muted">—</div>
+      <button class="btn" id="btn-signout">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="muted">Investment Plan</div>
+            <div id="planName" style="font-weight:800;font-size:18px">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">Balance</div>
+            <div id="balance" style="font-weight:800;font-size:18px">—</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:12px">
+          <div class="stat" style="flex:1">
+            <div class="muted">Invested</div><div id="invested" class="value">—</div>
+          </div>
+          <div class="stat" style="flex:1">
+            <div class="muted">Weekly ROI</div><div id="roi" class="value">—</div>
+          </div>
+          <div class="stat" style="flex:1">
+            <div class="muted">Next Payout</div><div id="nextPayout" class="value">—</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn" id="btn-withdraw">Request Withdrawal</button>
+          <button class="btn" id="btn-refresh" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)">Refresh</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 6px 0">Transaction History</h4>
+        <div id="tx-list">
+          <div class="empty">Loading transactions…</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">Earnings Overview</h3>
+        <div class="muted">Total earned so far</div>
+        <div style="font-size:26px;font-weight:800;margin-top:8px" id="totalEarned">—</div>
+
+        <div style="margin-top:12px">
+          <h4 style="margin:0 0 6px 0">Quick actions</h4>
+          <div class="muted">Request a withdrawal or view payout details.</div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn" id="btn-withdraw-2">Withdraw</button>
+            <button class="btn" id="btn-contact" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)">Contact Support</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 6px 0">Notes</h4>
+        <div class="muted">Payouts are calculated weekly and credited automatically to your balance. Withdrawals require approval by the admin.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // TODO: Paste same Firebase config as index.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyBNpB_rDh6wBbInp1gppxZ27ZxeBU6Nb6g",
+      authDomain: "luxpowertek-4f650.firebaseapp.com",
+      projectId: "luxpowertek-4f650",
+      storageBucket: "luxpowertek-4f650.appspot.com",
+      messagingSenderId: "316144364474",
+      appId: "1:316144364474:web:dfe8838c6ba0e874aa4b83"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userNameEl = document.getElementById('userName');
+    const planNameEl = document.getElementById('planName');
+    const balanceEl = document.getElementById('balance');
+    const investedEl = document.getElementById('invested');
+    const roiEl = document.getElementById('roi');
+    const nextPayoutEl = document.getElementById('nextPayout');
+    const totalEarnedEl = document.getElementById('totalEarned');
+    const txListEl = document.getElementById('tx-list');
+
+    const btnSignout = document.getElementById('btn-signout');
+    const btnWithdraw = document.getElementById('btn-withdraw');
+    const btnWithdraw2 = document.getElementById('btn-withdraw-2');
+    const btnRefresh = document.getElementById('btn-refresh');
+    const btnContact = document.getElementById('btn-contact');
+
+    btnSignout.addEventListener('click', async ()=>{ await signOut(auth); window.location.href = 'index.html'; });
+
+    // Auth state
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){ window.location.href='index.html'; return; }
+      const uid = user.uid;
+      // fetch user document (we stored it at users/{authUid})
+      const userDocRef = doc(db, 'users', uid);
+      const userSnap = await getDoc(userDocRef);
+      if(!userSnap.exists()){
+        // fallback: try finding by email
+        const usersRef = collection(db,'users');
+        const q = query(usersRef, where('email','==',user.email));
+        const found = await getDocs(q);
+        if(found.empty){ alert('User profile not found. Contact support.'); await signOut(auth); window.location.href='index.html'; return; }
+        const userDoc = found.docs[0];
+        populate(userDoc.data(), userDoc.id);
+      } else {
+        populate(userSnap.data(), userSnap.id);
+      }
+    });
+
+    async function populate(data, docId){
+      const fullName = data.fullName || data.email || 'Investor';
+      userNameEl.textContent = fullName;
+      planNameEl.textContent = data.plan || '—';
+      balanceEl.textContent = formatCurrency(data.balance || 0);
+      investedEl.textContent = formatCurrency(data.investedAmount || 0);
+      roiEl.textContent = (data.weeklyROI ? (data.weeklyROI + '%') : '—');
+      totalEarnedEl.textContent = formatCurrency(data.totalEarned || 0);
+      nextPayoutEl.textContent = data.nextPayout ? new Date(data.nextPayout.seconds * 1000).toLocaleDateString() : '—';
+
+      // load transactions (latest 20 for this user)
+      txListEl.innerHTML = '<div class="empty">Loading transactions…</div>';
+      const txRef = collection(db,'transactions');
+      const q = query(txRef, where('uid','==', docId), orderBy('date','desc'), limit(30));
+      const snap = await getDocs(q);
+      if(snap.empty){ txListEl.innerHTML = '<div class="empty">No transactions yet.</div>'; return; }
+
+      let html = '<table><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead><tbody>';
+      snap.forEach(d=>{
+        const t = d.data();
+        const dt = t.date ? new Date(t.date.seconds * 1000).toLocaleString() : '-';
+        const type = capitalize(t.type || '-');
+        const amt = formatCurrency(t.amount || 0);
+        const status = t.status || 'pending';
+        html += `<tr><td>${dt}</td><td>${type}</td><td>${amt}</td><td><span class="badge ${status==='completed'?'completed':'pending'}">${status}</span></td></tr>`;
+      });
+      html += '</tbody></table>';
+      txListEl.innerHTML = html;
+    }
+
+    function formatCurrency(n){ return '$' + Number(n || 0).toLocaleString(); }
+    function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    // Withdraw action: create a withdrawal request transaction (status: pending)
+    async function requestWithdrawal(){
+      const amount = prompt('Enter withdrawal amount (USD):');
+      if(!amount) return;
+      const amt = Number(amount);
+      if(isNaN(amt) || amt <= 0){ alert('Enter a valid amount.'); return; }
+
+      const user = auth.currentUser;
+      if(!user){ alert('Not signed in.'); return; }
+      // check balance
+      const userDocRef = doc(db,'users',user.uid);
+      const userSnap = await getDoc(userDocRef);
+      if(!userSnap.exists()){ alert('Profile missing.'); return; }
+      const data = userSnap.data();
+      if((data.balance || 0) < amt){ alert('Insufficient balance.'); return; }
+
+      // create withdrawal transaction
+      await addDoc(collection(db,'transactions'), {
+        uid: user.uid,
+        customUID: data.customUID || null,
+        type: 'withdraw',
+        amount: amt,
+        date: serverTimestamp(),
+        status: 'pending'
+      });
+
+      // optionally deduct balance immediately (or let admin approve)
+      await importAndDeduct(user.uid, amt);
+
+      alert('Withdrawal request submitted. Status: pending.');
+      // refresh
+      window.location.reload();
+    }
+
+    // small helper to deduct balance immediately
+    async function importAndDeduct(uid, amt){
+      const userDocRef = doc(db,'users',uid);
+      const userSnap = await getDoc(userDocRef);
+      if(!userSnap.exists()) return;
+      const data = userSnap.data();
+      const newBalance = (data.balance || 0) - amt;
+      // update balance (simple set using update via setDoc is omitted here for brevity; use your own admin rules)
+      await fetch('/update-balance', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({uid, balance:newBalance}) })
+        .catch(()=>console.warn('No server to auto-update balance. Admin must update balance in Firestore.'));
+    }
+
+    btnWithdraw.addEventListener('click', requestWithdrawal);
+    btnWithdraw2.addEventListener('click', requestWithdrawal);
+    btnRefresh.addEventListener('click', ()=> window.location.reload());
+    btnContact.addEventListener('click', ()=> window.location.href = 'mailto:invest@luxpowertek.example');
+
+  </script>
+</body>
+</html>
